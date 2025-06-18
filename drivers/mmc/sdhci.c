@@ -6,6 +6,7 @@
  * Back ported to the 8xx platform (from the 8260 platform) by
  * Murray.Jensen@cmst.csiro.au, 27-Jan-01.
  */
+#define LOG_DEBUG
 
 #include <cpu_func.h>
 #include <dm.h>
@@ -169,7 +170,7 @@ static int sdhci_transfer_data(struct sdhci_host *host, struct mmc_data *data)
 			}
 		}
 		if (timeout-- > 0)
-			udelay(10);
+			udelay(100);
 		else {
 			log_err("Transfer data timeout\n");
 			return -ETIMEDOUT;

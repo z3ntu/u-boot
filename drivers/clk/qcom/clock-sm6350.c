@@ -6,6 +6,8 @@
  * (C) Copyright 2025 Luca Weiss <luca.weiss@fairphone.com>
  */
 
+#define LOG_DEBUG
+
 #include <clk-uclass.h>
 #include <dm.h>
 #include <linux/delay.h>

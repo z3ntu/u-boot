@@ -6,6 +6,8 @@
  *
  * Based vaguely on the Linux code
  */
+#define LOG_DEBUG
+#define DEBUG
 
 #include <config.h>
 #include <blk.h>
@@ -1871,14 +1873,18 @@ static int sd_select_mode_and_width(struct mmc *mmc, uint card_caps)
 
 				/* configure the bus width (card + host) */
 				err = sd_select_bus_width(mmc, bus_width(*w));
-				if (err)
+				if (err) {
+					pr_debug("%s:%d DBG\n", __func__, __LINE__);
 					goto error;
+				}
 				mmc_set_bus_width(mmc, bus_width(*w));
 
 				/* configure the bus mode (card) */
 				err = sd_set_card_speed(mmc, mwt->mode);
-				if (err)
+				if (err) {
+					pr_debug("%s:%d DBG\n", __func__, __LINE__);
 					goto error;
+				}
 
 				/* configure the bus mode (host) */
 				mmc_select_mode(mmc, mwt->mode);
@@ -3004,7 +3010,7 @@ int mmc_start_init(struct mmc *mmc)
 #if CONFIG_IS_ENABLED(DM_MMC)
 	mmc_deferred_probe(mmc);
 #endif
-#if !defined(CONFIG_MMC_BROKEN_CD)
+#if !defined(CONFIG_MMC_BROKEN_CD) // foo
 	no_card = mmc_getcd(mmc) == 0;
 #else
 	no_card = 0;

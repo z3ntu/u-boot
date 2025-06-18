@@ -4,6 +4,7 @@
  *
  * (C) Copyright 2024 Linaro Ltd.
  */
+#define LOG_DEBUG
 
 #include <linux/types.h>
 #include <clk-uclass.h>
@@ -24,6 +25,11 @@
 #define PCIE1_PHY_RCHNG_CMD_RCGR 0x8d03c
 #define PCIE_1_PIPE_CLK_PHY_MUX 0x8d054
 
+#define GCC_SDCC2_APPS_CLK_SRC_REG 0x1400c
+
+#define APCS_GPLL9_STATUS 0x1c000
+#define APCS_GPLLX_ENA_REG 0x52010
+
 static const struct freq_tbl ftbl_gcc_usb30_prim_master_clk_src[] = {
 	F(66666667, CFG_CLK_SRC_GPLL0_EVEN, 4.5, 0, 0),
 	F(133333333, CFG_CLK_SRC_GPLL0, 4.5, 0, 0),
@@ -38,13 +44,31 @@ static const struct freq_tbl ftbl_gcc_usb30_sec_master_clk_src[] = {
 	{ }
 };
 
+static const struct freq_tbl ftbl_gcc_sdcc2_apps_clk_src[] = {
+	F(400000, CFG_CLK_SRC_CXO, 12, 1, 4),
+	F(19200000, CFG_CLK_SRC_CXO, 1, 0, 0),
+	F(25000000, CFG_CLK_SRC_GPLL0_EVEN, 12, 0, 0),
+	F(50000000, CFG_CLK_SRC_GPLL0_EVEN, 6, 0, 0),
+	F(100000000, CFG_CLK_SRC_GPLL0_EVEN, 3, 0, 0),
+	F(202000000, CFG_CLK_SRC_GPLL9, 4, 0, 0),
+	{ }
+};
+
+static struct pll_vote_clk gpll9_vote_clk = {
+	.status = APCS_GPLL9_STATUS,
+	.status_bit = BIT(31),
+	.ena_vote = APCS_GPLLX_ENA_REG,
+	.vote_bit = BIT(8),
+};
+
 static ulong sc7280_set_rate(struct clk *clk, ulong rate)
 {
 	struct msm_clk_priv *priv = dev_get_priv(clk->dev);
 	const struct freq_tbl *freq;
 
-	if (clk->id < priv->data->num_clks)
-		debug("%s: %s, requested rate=%ld\n", __func__, priv->data->clks[clk->id].name, rate);
+	debug("%s: clk %ld: %s, requested rate=%ld\n", __func__, clk->id, priv->data->clks[clk->id].name, rate);
+	//if (clk->id < priv->data->num_clks)
+	//	debug("%s: %s, requested rate=%ld\n", __func__, priv->data->clks[clk->id].name, rate);
 
 	switch (clk->id) {
 	case GCC_USB30_PRIM_MASTER_CLK:
@@ -72,6 +96,18 @@ static ulong sc7280_set_rate(struct clk *clk, ulong rate)
 	case GCC_PCIE1_PHY_RCHNG_CLK:
 		clk_rcg_set_rate(priv->base, PCIE1_PHY_RCHNG_CMD_RCGR, 5, CFG_CLK_SRC_GPLL0_EVEN);
 		return 100000000;
+	case GCC_SDCC2_APPS_CLK:
+		/* Enable GPLL9 so that we can point SDCC2_APPS_CLK_SRC at it */
+		clk_enable_gpll0(priv->base, &gpll9_vote_clk);
+		freq = qcom_find_freq(ftbl_gcc_sdcc2_apps_clk_src, rate);
+		printf("%s: got freq %u\n", __func__, freq->freq);
+		WARN(freq->src != CFG_CLK_SRC_GPLL9,
+		     "SDCC2_APPS_CLK_SRC not set to GPLL9, requested rate %lu\n",
+		     rate);
+		clk_rcg_set_rate_mnd(priv->base, GCC_SDCC2_APPS_CLK_SRC_REG,
+				     freq->pre_div, freq->m, freq->n, freq->src, 8);
+
+		return rate;
 	default:
 		return rate;
 	}

@@ -3,6 +3,8 @@
 # (C) Copyright 2006
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 
+ccflags-y += -DLOG_DEBUG
+
 obj-y += mmc.o
 obj-$(CONFIG_$(PHASE_)DM_MMC) += mmc-uclass.o
 

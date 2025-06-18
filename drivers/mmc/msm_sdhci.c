@@ -6,6 +6,7 @@
  *
  * Based on Linux driver
  */
+#define LOG_DEBUG
 
 #include <clk.h>
 #include <dm.h>
@@ -108,6 +109,7 @@ static int msm_sdc_clk_init(struct udevice *dev)
 	}
 
 	/* The clock is already enabled by the clk_bulk above */
+	printf("DBG %s:%d\n", __func__, __LINE__);
 	clk_rate = clk_set_rate(&prv->clks.clks[i], clk_rate);
 	/* If we get a rate of 0 then something has probably gone wrong. */
 	if (clk_rate == 0 || IS_ERR((void *)clk_rate)) {
@@ -159,6 +161,7 @@ static int msm_sdc_probe(struct udevice *dev)
 	u32 caps;
 	int ret;
 
+	printf("DBG %s:%d\n", __func__, __LINE__);
 	ret = reset_get_by_index(dev, 0, &bcr_rst);
 	if (!ret) {
 		reset_assert(&bcr_rst);
@@ -171,6 +174,7 @@ static int msm_sdc_probe(struct udevice *dev)
 
 	host->max_clk = 0;
 
+	printf("DBG %s:%d\n", __func__, __LINE__);
 	/* Init clocks */
 	ret = msm_sdc_clk_init(dev);
 	if (ret)
@@ -213,7 +217,7 @@ static int msm_sdc_probe(struct udevice *dev)
 
 	core_minor = core_version & SDCC_VERSION_MINOR_MASK;
 
-	log_debug("SDCC version %d.%d\n", core_major, core_minor);
+	printf("SDCC version %d.%d\n", core_major, core_minor);
 
 	/*
 	 * Support for some capabilities is not advertised by newer

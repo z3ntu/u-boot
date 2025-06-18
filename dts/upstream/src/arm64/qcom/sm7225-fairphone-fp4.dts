@@ -1001,7 +1001,8 @@
 	vmmc-supply = <&vreg_l9e>;
 	vqmmc-supply = <&vreg_l6e>;
 
-	cd-gpios = <&tlmm 94 GPIO_ACTIVE_LOW>;
+	//cd-gpios = <&tlmm 94 GPIO_ACTIVE_LOW>;
+	broken-cd;
 
 	status = "okay";
 };
