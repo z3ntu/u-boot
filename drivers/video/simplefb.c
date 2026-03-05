@@ -9,6 +9,7 @@
 #include <log.h>
 #include <video.h>
 #include <asm/global_data.h>
+#include <asm/system.h>
 
 static int simple_video_probe(struct udevice *dev)
 {
@@ -36,6 +37,11 @@ static int simple_video_probe(struct udevice *dev)
 	 */
 	plat->base = base;
 	plat->size = size;
+
+#ifdef CONFIG_ARM64
+	/* The framebuffer buffer might not be mapped on some devices */
+	mmu_map_region((phys_addr_t)plat->base, (phys_addr_t)plat->size+0x1000, false);
+#endif
 
 	video_set_flush_dcache(dev, true);
 
