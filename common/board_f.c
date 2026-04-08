@@ -182,7 +182,7 @@ static int print_cpuinfo(void)
 
 static int announce_dram_init(void)
 {
-	puts("DRAM2:  ");
+	puts("DRAM:  ");
 	return 0;
 }
 
@@ -230,7 +230,7 @@ static int show_dram_config(void)
 		print_size(gd->bd->bi_dram[i].size, "\n");
 #endif
 	}
-	debug("\nDRAM3:  ");
+	debug("\nDRAM:  ");
 
 	print_size(gd->ram_size, "");
 	if (!sizes_near(gd->ram_size, size)) {
@@ -934,35 +934,20 @@ static void initcall_run_f(void)
 #if CONFIG_IS_ENABLED(SYS_I2C_LEGACY)
 	INITCALL(init_func_i2c);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(announce_dram_init);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(dram_init);		/* configure available RAM banks */
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(POST)
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(post_init_f);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if defined(CFG_SYS_DRAM_TEST)
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(testdram);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #endif /* CFG_SYS_DRAM_TEST */
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(POST)
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(init_post);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/*
 	 * Now that we have DRAM mapped and working, we can
 	 * relocate the code and continue running from DRAM.
@@ -993,7 +978,6 @@ static void initcall_run_f(void)
 	INITCALL(reserve_board);
 	INITCALL(reserve_global_data);
 	INITCALL(reserve_fdt);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(OF_BOARD_FIXUP) && \
     CONFIG_IS_ENABLED(OF_INITIAL_DTB_READONLY)
 	INITCALL(reloc_fdt);
@@ -1008,7 +992,6 @@ static void initcall_run_f(void)
 	WATCHDOG_RESET();
 	INITCALL(setup_bdinfo);
 	INITCALL(display_new_sp);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	WATCHDOG_RESET();
 #if !CONFIG_IS_ENABLED(OF_BOARD_FIXUP) || \
     !CONFIG_IS_ENABLED(INITIAL_DTB_READONLY)
@@ -1022,7 +1005,6 @@ static void initcall_run_f(void)
 	INITCALL(do_elf_reloc_fixups);
 #endif
 	INITCALL(clear_bss);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/*
 	 * Deregister all cyclic functions before relocation, so that
 	 * gd->cyclic_list does not contain any references to pre-relocation
@@ -1036,7 +1018,6 @@ static void initcall_run_f(void)
 #if !CONFIG_IS_ENABLED(ARM) && !CONFIG_IS_ENABLED(SANDBOX)
 	INITCALL(jump_to_copy);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }
 
 void board_init_f(ulong boot_flags)
@@ -1047,9 +1028,7 @@ void board_init_f(ulong boot_flags)
 	gd->flags &= ~GD_FLG_HAVE_CONSOLE;
 	gd->boardf = &boardf;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	initcall_run_f();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 
 #if !defined(CONFIG_ARM) && !defined(CONFIG_SANDBOX) && \
 		!defined(CONFIG_EFI_APP) && !CONFIG_IS_ENABLED(X86_64) && \
@@ -1057,7 +1036,6 @@ void board_init_f(ulong boot_flags)
 	/* NOTREACHED - jump_to_copy() does not return */
 	hang();
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }
 
 #if defined(CONFIG_X86) || defined(CONFIG_ARC)

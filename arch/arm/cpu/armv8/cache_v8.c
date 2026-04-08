@@ -798,53 +798,21 @@ static void setup_all_pgtables(void)
 	gd->arch.tlb_size = tlb_size;
 }
 
-static inline void set_sctlr2(unsigned long val)
-{
-	unsigned int el;
-
-	printf("%s:%d DBG\n", __func__, __LINE__);
-	el = current_el();
-	printf("%s:%d DBG\n", __func__, __LINE__);
-	if (el == 1) {
-		printf("%s:%d DBG\n", __func__, __LINE__);
-		asm volatile("msr sctlr_el1, %0" : : "r" (val) : "cc");
-	} else if (el == 2) {
-		printf("%s:%d DBG\n", __func__, __LINE__);
-		asm volatile("msr sctlr_el2, %0" : : "r" (val) : "cc");
-	} else {
-		printf("%s:%d DBG\n", __func__, __LINE__);
-		asm volatile("msr sctlr_el3, %0" : : "r" (val) : "cc");
-	}
-
-	printf("%s:%d DBG\n", __func__, __LINE__);
-	asm volatile("isb");
-	printf("%s:%d DBG\n", __func__, __LINE__);
-}
-
 /* to activate the MMU we need to set up virtual memory */
 __weak void mmu_setup(void)
 {
 	int el;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* Set up page tables only once */
-	if (!gd->arch.tlb_fillptr) {
-		printf("%s:%d DBG\n", __func__, __LINE__);
+	if (!gd->arch.tlb_fillptr)
 		setup_all_pgtables();
-	}
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	el = current_el();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	set_ttbr_tcr_mair(el, gd->arch.tlb_addr, get_tcr(NULL, NULL),
 			  MEMORY_ATTRIBUTES);
 
 	/* enable the mmu */
-	printf("%s:%d DBG\n", __func__, __LINE__);
-	get_sctlr();
-	printf("%s:%d DBG\n", __func__, __LINE__);
-	set_sctlr2(get_sctlr() | CR_M);
-	printf("%s:%d DBG\n", __func__, __LINE__);
+	set_sctlr(get_sctlr() | CR_M);
 }
 
 /*
@@ -909,27 +877,17 @@ void flush_dcache_range(unsigned long start, unsigned long stop)
 
 void dcache_enable(void)
 {
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* The data cache is not active unless the mmu is enabled */
-	if (!mmu_status()) {
-		printf("%s:%d DBG\n", __func__, __LINE__);
+	if (!mmu_status())
 		mmu_setup();
-	}
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* Set up page tables only once (it is done also by mmu_setup()) */
-	if (!gd->arch.tlb_fillptr) {
-		printf("%s:%d DBG\n", __func__, __LINE__);
+	if (!gd->arch.tlb_fillptr)
 		setup_all_pgtables();
-	}
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	invalidate_dcache_all();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	__asm_invalidate_tlb_all();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	set_sctlr(get_sctlr() | CR_C);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }
 
 void dcache_disable(void)
@@ -1261,11 +1219,8 @@ int mmu_status(void)
  */
 void __weak enable_caches(void)
 {
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	icache_enable();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	dcache_enable();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }
 
 void arch_dump_mem_attrs(void)

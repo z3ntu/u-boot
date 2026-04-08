@@ -719,35 +719,27 @@ void enable_caches(void)
 	u64 pt_size;
 	ulong carveout_start;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	gd->arch.tlb_fillptr = tlb_addr;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	build_mem_map();
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	icache_enable();
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* Create normal system page tables */
 	setup_pgtables();
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	pt_size = (uintptr_t)gd->arch.tlb_fillptr -
 		  (uintptr_t)gd->arch.tlb_addr;
-	printf("Primary pagetable size: %lluKiB\n", pt_size / 1024);
+	debug("Primary pagetable size: %lluKiB\n", pt_size / 1024);
 
 	/* Create emergency page tables */
 	gd->arch.tlb_size -= pt_size;
 	gd->arch.tlb_addr = gd->arch.tlb_fillptr;
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	setup_pgtables();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	gd->arch.tlb_emerg = gd->arch.tlb_addr;
 	gd->arch.tlb_addr = tlb_addr;
 	gd->arch.tlb_size = tlb_size;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* We do the carveouts only for QCS404, for now. */
 	if (fdt_node_check_compatible(gd->fdt_blob, 0, "qcom,qcs404") == 0) {
 		carveout_start = get_timer(0);
@@ -755,7 +747,5 @@ void enable_caches(void)
 		carve_out_reserved_memory();
 		debug("carveout time: %lums\n", get_timer(carveout_start));
 	}
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	dcache_enable();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }

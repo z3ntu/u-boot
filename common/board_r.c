@@ -111,9 +111,7 @@ static int initr_reloc(void)
 static int initr_caches(void)
 {
 	/* Enable caches */
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	enable_caches();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 }
 #endif
@@ -606,18 +604,12 @@ static void initcall_run_r(void)
 	 * Please do not add logic to this function (variables, if (), etc.).
 	 * For simplicity it should remain an ordered list of function calls.
 	 */
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_trace);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_reloc);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(event_init);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* TODO: could x86/PPC have this also perhaps? */
 #if CONFIG_IS_ENABLED(ARM) || CONFIG_IS_ENABLED(RISCV)
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_caches);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/* Note: For Freescale LS2 SoCs, new MMU table is created in DDR.
 	 *	 A temporary mapping of IFC high region is since removed,
 	 *	 so environmental variables in NOR flash is not available
@@ -625,9 +617,7 @@ static void initcall_run_r(void)
 	 *	 region.
 	 */
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_reloc_global_data);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(SYS_INIT_RAM_LOCK) && CONFIG_IS_ENABLED(E500)
 	INITCALL(initr_unlock_ram_in_cache);
 #endif
@@ -635,7 +625,6 @@ static void initcall_run_r(void)
 	INITCALL(initr_malloc);
 	INITCALL(log_init);
 	INITCALL(initr_bootstage); /* Needs malloc() but has its own timer */
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(CONSOLE_RECORD)
 	INITCALL(console_record_init);
 #endif
@@ -643,7 +632,6 @@ static void initcall_run_r(void)
 	INITCALL(noncached_init);
 #endif
 	INITCALL(initr_of_live);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(DM)
 	INITCALL(initr_dm);
 #endif
@@ -675,7 +663,6 @@ static void initcall_run_r(void)
 	INITCALL(initr_dm_devices);
 	INITCALL(stdio_init_tables);
 	INITCALL(serial_initialize);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_announce);
 	INITCALL(dm_announce);
 #if CONFIG_IS_ENABLED(WDT)
@@ -687,7 +674,6 @@ static void initcall_run_r(void)
 	INITCALL(board_early_init_r);
 #endif
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(POST)
 	INITCALL(post_output_backlog);
 #endif
@@ -699,7 +685,6 @@ static void initcall_run_r(void)
 	 */
 	INITCALL(pci_init);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(ARCH_EARLY_INIT_R)
 	INITCALL(arch_early_init_r);
 #endif
@@ -708,7 +693,6 @@ static void initcall_run_r(void)
 	INITCALL(initr_flash);
 #endif
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(PPC) || CONFIG_IS_ENABLED(M68K) || CONFIG_IS_ENABLED(X86)
 	/* initialize higher level parts of CPU like time base and timers */
 	INITCALL(cpu_init_r);
@@ -721,7 +705,6 @@ static void initcall_run_r(void)
 #endif
 #if CONFIG_IS_ENABLED(CMD_ONENAND)
 	INITCALL(initr_onenand);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #endif
 #if CONFIG_IS_ENABLED(MMC)
 	INITCALL(initr_mmc);
@@ -736,7 +719,6 @@ static void initcall_run_r(void)
 #if CONFIG_IS_ENABLED(SYS_MALLOC_BOOTPARAMS)
 	INITCALL(initr_malloc_bootparams);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	WATCHDOG_RESET();
 	INITCALL(cpu_secondary_init_r);
 #if CONFIG_IS_ENABLED(ID_EEPROM)
@@ -752,7 +734,6 @@ static void initcall_run_r(void)
 #endif
 	INITCALL(stdio_add_devices);
 	INITCALL(jumptable_init);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(API)
 	INITCALL(api_init);
 #endif
@@ -770,7 +751,6 @@ static void initcall_run_r(void)
 	INITCALL(misc_init_r);
 #endif
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(CMD_KGDB)
 	INITCALL(kgdb_init);
 #endif
@@ -791,27 +771,20 @@ static void initcall_run_r(void)
 	WATCHDOG_RESET();
 	INITCALL(initr_net);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if CONFIG_IS_ENABLED(POST)
 	INITCALL(initr_post);
 #endif
 	WATCHDOG_RESET();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL_EVT(EVT_LAST_STAGE_INIT);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 #if defined(CFG_PRAM)
 	INITCALL(initr_mem);
 #endif
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(initr_boot_led_on);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	INITCALL(run_main_loop);
-	printf("%s:%d DBG\n", __func__, __LINE__);
 }
 
 void board_init_r(gd_t *new_gd, ulong dest_addr)
 {
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	/*
 	 * The pre-relocation drivers may be using memory that has now gone
 	 * away. Mark serial as unavailable - this will fall back to the debug
@@ -837,9 +810,7 @@ void board_init_r(gd_t *new_gd, ulong dest_addr)
 #endif
 	gd->flags &= ~GD_FLG_LOG_READY;
 
-	printf("%s:%d DBG\n", __func__, __LINE__);
 	initcall_run_r();
-	printf("%s:%d DBG\n", __func__, __LINE__);
 
 	/* NOTREACHED - run_main_loop() does not return */
 	hang();
