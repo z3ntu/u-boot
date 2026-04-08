@@ -42,7 +42,7 @@ static int try_sysinfo(void)
 	ret = sysinfo_get_str(dev, SYSID_BOARD_MODEL, sizeof(str), str);
 	if (ret)
 		return ret;
-	printf("Model: %s\n", str);
+	printf("DBG2 Model: %s\n", str);
 
 	if (IS_ENABLED(CONFIG_SYSINFO_EXTRA)) {
 		const struct to_show *item;
@@ -71,7 +71,7 @@ int show_board_info(void)
 
 			model = fdt_getprop(gd->fdt_blob, 0, "model", NULL);
 			if (model)
-				printf("Model: %s\n", model);
+				printf("DBG Model: %s\n", model);
 		}
 	}
 
