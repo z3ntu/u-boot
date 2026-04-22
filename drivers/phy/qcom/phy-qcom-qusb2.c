@@ -498,6 +498,8 @@ static struct phy_ops qusb2phy_ops = {
 };
 
 static const struct udevice_id qusb2phy_ids[] = {
+	{ .compatible = "qcom,msm8953-qusb2-phy",
+	  .data = (ulong)&msm8996_phy_cfg },
 	{ .compatible = "qcom,msm8996-qusb2-phy",
 	  .data = (ulong)&msm8996_phy_cfg },
 	{ .compatible = "qcom,qusb2-phy" },
