@@ -6,6 +6,7 @@
  *
  * Based on dwc3-omap.c.
  */
+#define DEBUG
 
 #include <dm.h>
 #include <reset.h>

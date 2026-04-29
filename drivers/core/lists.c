@@ -262,6 +262,7 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 				}
 			}
 
+			dm_warn("%s:%d DBG entry=%s name=%s\n", __func__, __LINE__, entry->name, name);
 			ret = device_bind_with_driver_data(parent, entry, name,
 							   id ? id->data : 0, node,
 							   &dev);
@@ -275,6 +276,7 @@ int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
 				return log_msg_ret("bind", ret);
 			}
 
+			dm_warn("%s:%d DBG success? entry=%s name=%s\n", __func__, __LINE__, entry->name, name);
 			if (devp)
 				*devp = dev;
 

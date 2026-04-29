@@ -233,6 +233,7 @@ static int msm_clk_probe(struct udevice *dev)
 	struct msm_clk_data *data = (struct msm_clk_data *)dev_get_driver_data(dev);
 	struct msm_clk_priv *priv = dev_get_priv(dev);
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	priv->base = dev_read_addr(dev);
 	if (priv->base == FDT_ADDR_T_NONE)
 		return -EINVAL;
@@ -401,6 +402,7 @@ int qcom_cc_bind(struct udevice *parent)
 	struct driver *drv;
 	int ret;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	/* Get a handle to the common clk handler */
 	drv = lists_driver_lookup_name("qcom_clk");
 	if (!drv)
@@ -441,6 +443,7 @@ int qcom_cc_bind(struct udevice *parent)
 			goto unbind_rstdev;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 
 unbind_rstdev:
@@ -448,6 +451,7 @@ unbind_rstdev:
 unbind_clkdev:
 	device_unbind(clkdev);
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return ret;
 }
 
@@ -489,6 +493,7 @@ static const struct reset_ops qcom_reset_ops = {
 
 static int qcom_reset_probe(struct udevice *dev)
 {
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	/* Set our priv pointer to the base address */
 	dev_set_priv(dev, (void *)dev_read_addr(dev));
 
@@ -564,6 +569,7 @@ static const struct power_domain_ops qcom_power_ops = {
 
 static int qcom_power_probe(struct udevice *dev)
 {
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	/* Set our priv pointer to the base address */
 	dev_set_priv(dev, (void *)dev_read_addr(dev));
 

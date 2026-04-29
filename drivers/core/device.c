@@ -7,6 +7,7 @@
  * (C) Copyright 2012
  * Pavel Herrmann <morpheus.ibis@gmail.com>
  */
+#define DEBUG
 
 #include <cpu_func.h>
 #include <errno.h>
@@ -79,6 +80,8 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 	dev->parent = parent;
 	dev->driver = drv;
 	dev->uclass = uc;
+
+	dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 
 	dev->seq_ = -1;
 	if (CONFIG_IS_ENABLED(DM_SEQ_ALIAS) &&
@@ -160,12 +163,15 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 		list_add_tail(&dev->sibling_node, &parent->child_head);
 	}
 
+	dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 	ret = uclass_bind_device(dev);
 	if (ret)
 		goto fail_uclass_bind;
 
+	dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 	/* if we fail to bind we remove device from successors and free it */
 	if (drv->bind) {
+		dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 		ret = drv->bind(dev);
 		if (ret)
 			goto fail_bind;
@@ -188,6 +194,7 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 
 	dev_or_flags(dev, DM_FLAG_BOUND);
 
+	dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 	return 0;
 
 fail_uclass_post_bind:
@@ -234,6 +241,7 @@ fail_alloc1:
 
 	free(dev);
 
+	dm_warn("%s:%d DBG driver=%s name=%s\n", __func__, __LINE__, drv->name, name);
 	return ret;
 }
 
@@ -486,6 +494,7 @@ int device_probe(struct udevice *dev)
 	if (!dev)
 		return -EINVAL;
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	if (dev_get_flags(dev) & DM_FLAG_ACTIVATED)
 		return 0;
 
@@ -500,6 +509,7 @@ int device_probe(struct udevice *dev)
 	if (ret)
 		goto fail;
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	/* Ensure all parents are probed */
 	if (dev->parent) {
 		ret = device_probe(dev->parent);
@@ -526,6 +536,7 @@ int device_probe(struct udevice *dev)
 			goto fail;
 	}
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	/*
 	 * Process pinctrl for everything except the root device, and
 	 * continue regardless of the result of pinctrl. Don't process pinctrl
@@ -555,6 +566,7 @@ int device_probe(struct udevice *dev)
 			goto fail;
 	}
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	ret = device_get_dma_constraints(dev);
 	if (ret)
 		goto fail;
@@ -580,12 +592,17 @@ int device_probe(struct udevice *dev)
 			goto fail;
 	}
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	if (drv->probe) {
 		ret = drv->probe(dev);
-		if (ret)
+		if (ret) {
+			dm_warn("%s: Device '%s' failed to probe!\n",
+				__func__, dev->name);
 			goto fail;
+		}
 	}
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	ret = uclass_post_probe_device(dev);
 	if (ret)
 		goto fail_uclass;
@@ -601,6 +618,7 @@ int device_probe(struct udevice *dev)
 	if (ret)
 		goto fail_event;
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	return 0;
 fail_event:
 fail_uclass:
@@ -613,6 +631,7 @@ fail:
 
 	device_free(dev);
 
+	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 	return ret;
 }
 

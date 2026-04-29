@@ -4,6 +4,8 @@
  *
  * Based on Linux driver
  */
+#define DEBUG
+#define LOG_DEBUG
 
 #include <dm.h>
 #include <generic-phy.h>

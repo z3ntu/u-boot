@@ -5,6 +5,7 @@
  * (C) Copyright 2016
  *     Texas Instruments Incorporated, <www.ti.com>
  */
+#define DEBUG
 
 #include <dm.h>
 #include <asm/global_data.h>

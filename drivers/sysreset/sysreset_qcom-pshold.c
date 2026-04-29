@@ -35,8 +35,10 @@ static struct sysreset_ops qcom_pshold_ops = {
 static int qcom_pshold_probe(struct udevice *dev)
 {
 	struct qcom_pshold_priv *priv = dev_get_priv(dev);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	priv->base = dev_read_addr(dev);
+	log_err("%s:%d DBG priv->base=%llx\n", __func__, __LINE__, priv->base);
 	return priv->base == FDT_ADDR_T_NONE ? -EINVAL : 0;
 }
 
