@@ -36,7 +36,7 @@
 			width = <1080>;
 			height = <2160>;
 			stride = <(1080 * 3)>;
-			format = "r8g8b8";
+			format = "x8r8g8b8";
 
 			power-domains = <&gcc MDSS_GDSC>;
 
