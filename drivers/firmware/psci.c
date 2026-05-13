@@ -179,13 +179,13 @@ static int psci_bind(struct udevice *dev)
 	/* No SYSTEM_RESET support for PSCI 0.1 */
 	if (device_is_compatible(dev, "arm,psci-0.2") ||
 	    device_is_compatible(dev, "arm,psci-1.0")) {
-		int ret;
+		//int ret;
 
 		/* bind psci-sysreset optionally */
-		ret = device_bind_driver(dev, "psci-sysreset", "psci-sysreset",
-					 NULL);
-		if (ret)
-			pr_debug("PSCI System Reset was not bound.\n");
+		//ret = device_bind_driver(dev, "psci-sysreset", "psci-sysreset",
+		//			 NULL);
+		//if (ret)
+		//	pr_debug("PSCI System Reset was not bound.\n");
 		if (IS_ENABLED(CONFIG_SYSRESET_QCOM_PSCI) &&
 		    device_bind_driver(dev, "qcom_psci-sysreset",
 				       "qcom_psci-sysreset", NULL))
