@@ -25,30 +25,36 @@
 int sysreset_request(struct udevice *dev, enum sysreset_t type)
 {
 	struct sysreset_ops *ops = sysreset_get_ops(dev);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	if (!ops->request)
 		return -ENOSYS;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return ops->request(dev, type);
 }
 
 int sysreset_get_status(struct udevice *dev, char *buf, int size)
 {
 	struct sysreset_ops *ops = sysreset_get_ops(dev);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	if (!ops->get_status)
 		return -ENOSYS;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return ops->get_status(dev, buf, size);
 }
 
 int sysreset_get_last(struct udevice *dev)
 {
 	struct sysreset_ops *ops = sysreset_get_ops(dev);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	if (!ops->get_last)
 		return -ENOSYS;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return ops->get_last(dev);
 }
 
@@ -56,18 +62,23 @@ int sysreset_walk(enum sysreset_t type)
 {
 	struct udevice *dev;
 	int ret = -ENOSYS;
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	while (ret != -EINPROGRESS && type < SYSRESET_COUNT) {
 		for (uclass_first_device(UCLASS_SYSRESET, &dev);
 		     dev;
 		     uclass_next_device(&dev)) {
+			log_err("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
 			ret = sysreset_request(dev, type);
-			if (ret == -EINPROGRESS)
+			if (ret == -EINPROGRESS) {
+				log_err("%s:%d DBG break!\n", __func__, __LINE__);
 				break;
+			}
 		}
 		type++;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return ret;
 }
 
@@ -95,6 +106,7 @@ void sysreset_walk_halt(enum sysreset_t type)
 {
 	int ret;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	ret = sysreset_walk(type);
 
 	/* Wait for the reset to take effect */
@@ -114,6 +126,7 @@ void sysreset_walk_halt(enum sysreset_t type)
  */
 void reset_cpu(void)
 {
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	sysreset_walk_halt(SYSRESET_WARM);
 }
 

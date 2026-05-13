@@ -17,16 +17,20 @@ static int psci_sysreset_request(struct udevice *dev, enum sysreset_t type)
 {
 	switch (type) {
 	case SYSRESET_WARM:
+		log_err("%s:%d DBG\n", __func__, __LINE__);
 	case SYSRESET_COLD:
+		log_err("%s:%d DBG\n", __func__, __LINE__);
 		psci_sys_reset(type);
 		break;
 	case SYSRESET_POWER_OFF:
+		log_err("%s:%d DBG\n", __func__, __LINE__);
 		psci_sys_poweroff();
 		break;
 	default:
 		return -EPROTONOSUPPORT;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return -EINPROGRESS;
 }
 
