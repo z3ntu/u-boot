@@ -467,6 +467,7 @@ static int qusb2phy_probe(struct udevice *dev)
 {
 	struct qusb2_phy *qphy = dev_get_priv(dev);
 	int ret;
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	qphy->base = (void __iomem *)dev_read_addr(dev);
 	if (IS_ERR(qphy->base))
@@ -491,6 +492,7 @@ static int qusb2phy_probe(struct udevice *dev)
 	}
 
 	debug("%s success qusb phy cfg %p\n", __func__, qphy->cfg);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 }
 

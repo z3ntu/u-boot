@@ -50,6 +50,7 @@ static int dwc3_generic_probe(struct udevice *dev,
 	struct dwc3_glue_data *glue = dev_get_plat(dev->parent);
 	int __maybe_unused index;
 	ofnode __maybe_unused node;
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	dwc3->dev = dev;
 	dwc3->maximum_speed = plat->maximum_speed;
@@ -188,6 +189,7 @@ static int dwc3_generic_peripheral_probe(struct udevice *dev)
 {
 	struct dwc3_generic_priv *priv = dev_get_priv(dev);
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return dwc3_generic_probe(dev, priv, USB_DR_MODE_PERIPHERAL);
 }
 
@@ -195,6 +197,7 @@ static int dwc3_generic_peripheral_remove(struct udevice *dev)
 {
 	struct dwc3_generic_priv *priv = dev_get_priv(dev);
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return dwc3_generic_remove(dev, priv);
 }
 
@@ -203,6 +206,7 @@ static int dwc3_gadget_handle_interrupts(struct udevice *dev)
 	struct dwc3_generic_priv *priv = dev_get_priv(dev);
 	struct dwc3 *dwc3 = &priv->dwc3;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	dwc3_gadget_uboot_handle_interrupt(dwc3);
 
 	return 0;
@@ -442,6 +446,7 @@ struct dwc3_glue_ops ti_ops = {
 
 static void dwc3_qcom_vbus_override_enable(void __iomem *qscratch_base, bool enable)
 {
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	if (enable) {
 		setbits_le32(qscratch_base + QSCRATCH_SS_PHY_CTRL,
 				  LANE0_PWR_PRESENT);
@@ -458,6 +463,7 @@ static void dwc3_qcom_vbus_override_enable(void __iomem *qscratch_base, bool ena
 /* For controllers running without superspeed PHYs */
 static void dwc3_qcom_select_utmi_clk(void __iomem *qscratch_base)
 {
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	/* Configure dwc3 to use UTMI clock as PIPE clock not present */
 	setbits_le32(qscratch_base + QSCRATCH_GENERAL_CFG,
 			  PIPE_UTMI_CLK_DIS);
@@ -480,6 +486,7 @@ static void dwc3_qcom_glue_configure(struct udevice *dev, int index,
 	fdt_addr_t regs = glue->regs;
 	void __iomem *qscratch_base;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	/* Offset for qscratch base when using flat DT */
 	if (device_is_compatible(dev, "qcom,snps-dwc3"))
 		regs += SDM845_QSCRATCH_BASE_OFFSET;
@@ -495,6 +502,7 @@ static void dwc3_qcom_glue_configure(struct udevice *dev, int index,
 
 	if (mode != USB_DR_MODE_HOST)
 		dwc3_qcom_vbus_override_enable(qscratch_base, true);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 }
 
 /* In cases where there is no dwc3 node and it's flattened into the glue node */
@@ -527,6 +535,7 @@ static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 	enum usb_dr_mode dr_mode;
 	struct udevice *dev;
 	int ret;
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	debug("%s: subnode name: %s\n", __func__, name);
 
@@ -559,6 +568,7 @@ static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 		return ret;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 }
 
@@ -568,6 +578,7 @@ int dwc3_glue_bind(struct udevice *parent)
 	ofnode node;
 	int ret;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	if (ops && ops->glue_get_ctrl_dev) {
 		ret = ops->glue_get_ctrl_dev(parent, &node);
 		if (ret)
@@ -584,6 +595,7 @@ int dwc3_glue_bind(struct udevice *parent)
 			return ret;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 }
 
@@ -599,6 +611,7 @@ static int dwc3_glue_reset_init(struct udevice *dev,
 		return ret;
 
 	if (device_is_compatible(dev, "qcom,dwc3")) {
+		log_err("%s:%d DBG\n", __func__, __LINE__);
 		reset_assert_bulk(&glue->resets);
 		/* We should wait at least 6 sleep clock cycles, that's
 		 * (6 / 32764) * 1000000 ~= 200us. But some platforms
@@ -646,8 +659,10 @@ int dwc3_glue_probe(struct udevice *dev)
 	int ret;
 	struct phy phy;
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	ret = generic_phy_get_by_name(dev, "usb3-phy", &phy);
 	if (!ret) {
+		log_err("%s:%d DBG\n", __func__, __LINE__);
 		ret = generic_phy_init(&phy);
 		if (ret)
 			return ret;
@@ -698,12 +713,14 @@ int dwc3_glue_probe(struct udevice *dev)
 		index++;
 	}
 
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 	return 0;
 }
 
 int dwc3_glue_remove(struct udevice *dev)
 {
 	struct dwc3_glue_data *glue = dev_get_plat(dev);
+	log_err("%s:%d DBG\n", __func__, __LINE__);
 
 	reset_release_bulk(&glue->resets);
 

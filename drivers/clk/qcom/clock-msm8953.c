@@ -39,10 +39,25 @@ static const struct freq_tbl ftbl_sdcc2_apps_clk_src[] = {
 	{ }
 };
 
+static const struct freq_tbl ftbl_usb30_master_clk_src[] = {
+	F(80000000, (2 << 8) /*P_GPLL0_DIV2*/, 5, 0, 0),
+	F(100000000, CFG_CLK_SRC_GPLL0, 8, 0, 0),
+	F(133330000, CFG_CLK_SRC_GPLL0, 6, 0, 0),
+	{ }
+};
+
+static const struct freq_tbl ftbl_usb30_mock_utmi_clk_src[] = {
+	F(19200000, CFG_CLK_SRC_CXO, 1, 0, 0),
+	F(60000000, (2 << 8) /*P_GPLL6_DIV2*/, 9, 1, 1),
+	{ }
+};
+
 static ulong msm8953_set_rate(struct clk *clk, ulong rate)
 {
 	struct msm_clk_priv *priv = dev_get_priv(clk->dev);
 	const struct freq_tbl *freq;
+
+	log_err("%s:%d DBG clk->id=%ld rate=%ld\n", __func__, __LINE__, clk->id, rate);
 
 	switch (clk->id) {
 	case GCC_SDCC1_APPS_CLK: /* SDC1 */
@@ -58,7 +73,20 @@ static ulong msm8953_set_rate(struct clk *clk, ulong rate)
 	case GCC_BLSP1_UART1_APPS_CLK: /* UART1 */
 		//msm8953_clk_init_uart(priv->base, clk->id);
 		return 7372800;
+	case GCC_USB30_MASTER_CLK:
+		freq = qcom_find_freq(ftbl_usb30_master_clk_src, rate);
+		clk_rcg_set_rate_mnd(priv->base, 0x3f00c,
+				     freq->pre_div, freq->m, freq->n, freq->src, 0);
+		return freq->freq;
+	case GCC_USB30_MOCK_UTMI_CLK:
+		freq = qcom_find_freq(ftbl_usb30_mock_utmi_clk_src, rate);
+		clk_rcg_set_rate_mnd(priv->base, 0x3f020,
+				     freq->pre_div, freq->m, freq->n, freq->src, 8);
+		return freq->freq;
 	default:
+		// TODO Enable usb30_master_clk_src for gcc_pcnoc_usb3_axi_clk & gcc_usb30_master_clk?
+		// TODO Enable usb30_mock_utmi_clk_src for gcc_usb30_mock_utmi_clk?
+		log_err("%s:%d DBG clk->id=%ld\n", __func__, __LINE__, clk->id);
 		return 0;
 	}
 }
@@ -69,6 +97,13 @@ static const struct gate_clk msm8953_clks[] = {
 	GATE_CLK_POLLED(GCC_SDCC1_APPS_CLK,	0x42018, BIT(0), 0x42018),
 	GATE_CLK_POLLED(GCC_SDCC2_AHB_CLK,	0x4301c, BIT(0), 0x4301c),
 	GATE_CLK_POLLED(GCC_SDCC2_APPS_CLK,	0x43018, BIT(0), 0x43018),
+
+	GATE_CLK_POLLED(GCC_USB30_MASTER_CLK,		0x3f000, BIT(0), 0x3f000),
+	GATE_CLK_POLLED(GCC_USB30_SLEEP_CLK,		0x3f004, BIT(0), 0x3f004),
+	GATE_CLK_POLLED(GCC_USB30_MOCK_UTMI_CLK,	0x3f008, BIT(0), 0x3f008),
+	GATE_CLK_POLLED(GCC_PCNOC_USB3_AXI_CLK,		0x3f038, BIT(0), 0x3f038),
+	//GATE_CLK_POLLED(GCC_USB_PHY_CFG_AHB_CLK,	0x3f080, BIT(0), 0x3f080),
+	GATE_CLK(GCC_USB_PHY_CFG_AHB_CLK,		0x3f080, BIT(0)),
 };
 
 static int msm8953_enable(struct clk *clk)
@@ -79,6 +114,12 @@ static int msm8953_enable(struct clk *clk)
 		log_warning("%s: unknown clk id %lu\n", __func__, clk->id);
 		return 0;
 	}
+
+	//switch (clk->id) {
+	//case GCC_USB30_MASTER_CLK:
+	//case GCC_PCNOC_USB3_AXI_CLK:
+	//	qcom_gate_clk_en(priv, USB30_MASTER_CLK_SRC);
+	//}
 
 	debug("%s: enabling clock %s\n", __func__, msm8953_clks[clk->id].name);
 

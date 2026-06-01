@@ -533,7 +533,8 @@ int device_probe(struct udevice *dev)
 	    !(drv->flags & DM_FLAG_DEFAULT_PD_CTRL_OFF)) {
 		ret = dev_power_domain_on(dev);
 		if (ret)
-			goto fail;
+			log_err("%s:%d DBG ignoring failing dev_power_domain_on!\n", __func__, __LINE__);
+			//goto fail;
 	}
 
 	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
@@ -631,7 +632,7 @@ fail:
 
 	device_free(dev);
 
-	dm_warn("%s:%d DBG dev=%s\n", __func__, __LINE__, dev->name);
+	dm_warn("%s:%d DBG dev=%s ret=%d\n", __func__, __LINE__, dev->name, ret);
 	return ret;
 }
 

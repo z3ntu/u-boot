@@ -3,6 +3,8 @@
  * Copyright (C) 2017 Texas Instruments Incorporated - https://www.ti.com/
  * Written by Jean-Jacques Hiblot  <jjhiblot@ti.com>
  */
+#define DEBUG
+#define LOG_DEBUG
 
 #define LOG_CATEGORY UCLASS_PHY
 
