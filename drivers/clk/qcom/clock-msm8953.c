@@ -4,6 +4,8 @@
  *
  * Copyright (c) 2026 Luca Weiss <luca.weiss@fairphone.com>
  */
+#define LOG_DEBUG
+#define DEBUG
 
 #include <clk-uclass.h>
 #include <dm.h>
@@ -12,6 +14,18 @@
 #include <dt-bindings/clock/qcom,gcc-msm8953.h>
 
 #include "clock-qcom.h"
+
+#define GPLL0_STATUS			(0x21000)
+#define GPLL0_STATUS_ACTIVE		BIT(30)
+#define APCS_GPLL_ENA_VOTE		(0x45000)
+#define APCS_GPLL_ENA_VOTE_GPLL0	BIT(0)
+
+static const struct pll_vote_clk gpll0_vote_clk = {
+	.status = GPLL0_STATUS,
+	.status_bit = GPLL0_STATUS_ACTIVE,
+	.ena_vote = APCS_GPLL_ENA_VOTE,
+	.vote_bit = APCS_GPLL_ENA_VOTE_GPLL0,
+};
 
 static const struct freq_tbl ftbl_sdcc1_apps_clk_src[] = {
 	F(144000, CFG_CLK_SRC_CXO, 16, 3, 25),
@@ -74,6 +88,7 @@ static ulong msm8953_set_rate(struct clk *clk, ulong rate)
 		//msm8953_clk_init_uart(priv->base, clk->id);
 		return 7372800;
 	case GCC_USB30_MASTER_CLK:
+		clk_enable_gpll0(priv->base, &gpll0_vote_clk);
 		freq = qcom_find_freq(ftbl_usb30_master_clk_src, rate);
 		clk_rcg_set_rate_mnd(priv->base, 0x3f00c,
 				     freq->pre_div, freq->m, freq->n, freq->src, 0);
@@ -115,11 +130,13 @@ static int msm8953_enable(struct clk *clk)
 		return 0;
 	}
 
-	//switch (clk->id) {
-	//case GCC_USB30_MASTER_CLK:
+	switch (clk->id) {
+	case GCC_USB30_MASTER_CLK:
 	//case GCC_PCNOC_USB3_AXI_CLK:
-	//	qcom_gate_clk_en(priv, USB30_MASTER_CLK_SRC);
-	//}
+		//qcom_gate_clk_en(priv, USB30_MASTER_CLK_SRC);
+		//clk_enable_cbc(priv->base + USB30_MASTER_CBCR);
+		break;
+	}
 
 	debug("%s: enabling clock %s\n", __func__, msm8953_clks[clk->id].name);
 
