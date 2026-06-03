@@ -258,7 +258,7 @@ static const struct qusb2_phy_cfg msm8996_phy_cfg = {
 	.regs = sm6115_regs_layout,
 
 	.has_pll_test = true,
-	.se_clk_scheme_default = true,
+	.se_clk_scheme_default = false, // FIXME needs to be false for msm8953, probably gets that via tcsr syscon
 	.disable_ctrl = (CLAMP_N_EN | FREEZIO_N | POWER_DOWN),
 	.mask_core_ready = PLL_LOCKED,
 	.autoresume_en = BIT(3),

@@ -206,7 +206,7 @@ static int dwc3_gadget_handle_interrupts(struct udevice *dev)
 	struct dwc3_generic_priv *priv = dev_get_priv(dev);
 	struct dwc3 *dwc3 = &priv->dwc3;
 
-	log_err("%s:%d DBG\n", __func__, __LINE__);
+	//log_err("%s:%d DBG\n", __func__, __LINE__);
 	dwc3_gadget_uboot_handle_interrupt(dwc3);
 
 	return 0;
