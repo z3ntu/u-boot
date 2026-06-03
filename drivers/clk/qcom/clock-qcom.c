@@ -520,6 +520,8 @@ static int qcom_power_set(struct power_domain *pwr, bool on)
 
 	value = readl(base + map->reg);
 
+	on = true; // FIXME USB30_GDSC for msm8953
+
 	if (on)
 		value &= ~GDSC_SW_COLLAPSE_MASK;
 	else
