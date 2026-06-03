@@ -9,10 +9,10 @@
 
 #include <clk-uclass.h>
 #include <dm.h>
+#include <dm/lists.h>
 
 /* NOP parent nodes to stub clocks */
 static const struct udevice_id nop_parent_ids[] = {
-	{ .compatible = "qcom,rpm-proc" },
 	{ .compatible = "qcom,glink-rpm" },
 	{ .compatible = "qcom,glink-smd-rpm" },
 	{ }
@@ -24,6 +24,40 @@ U_BOOT_DRIVER(nop_parent) = {
 	.of_match = nop_parent_ids,
 	.bind = dm_scan_fdt_dev,
 	.flags = DM_FLAG_DEFAULT_PD_CTRL_OFF,
+};
+
+int rpm_proc_bind(struct udevice *dev)
+{
+	ofnode child;
+	struct udevice *child_dev;
+	int ret;
+
+	/* smd-edge subnode has no compatible, bind nop_parent manually */
+	child = ofnode_find_subnode(dev_ofnode(dev), "smd-edge");
+	if (ofnode_valid(child)) {
+		ret = device_bind_driver_to_node(dev, "nop_parent", "smd-edge", child, NULL);
+		if (ret)
+			return ret;
+	}
+
+	dev_for_each_subnode(child, dev) {
+		ret = lists_bind_fdt(dev, child, &child_dev, NULL, false);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
+static const struct udevice_id rpm_proc_ids[] = {
+	{ .compatible = "qcom,rpm-proc" },
+};
+
+U_BOOT_DRIVER(rpm_proc) = {
+	.name = "rpm_proc",
+	.id = UCLASS_NOP,
+	.of_match = rpm_proc_ids,
+	.bind = rpm_proc_bind,
 };
 
 static ulong stub_clk_set_rate(struct clk *clk, ulong rate)
