@@ -5,13 +5,13 @@
  * Based on Linux driver
  */
 
+#include <asm/io.h>
+#include <clk.h>
 #include <dm.h>
 #include <generic-phy.h>
 #include <linux/bitops.h>
-#include <asm/io.h>
-#include <reset.h>
-#include <clk.h>
 #include <linux/delay.h>
+#include <reset.h>
 
 #include <dt-bindings/phy/phy-qcom-qusb2.h>
 
