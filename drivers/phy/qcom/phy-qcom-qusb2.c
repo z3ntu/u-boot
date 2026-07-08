@@ -11,7 +11,9 @@
 #include <generic-phy.h>
 #include <linux/bitops.h>
 #include <linux/delay.h>
+#include <regmap.h>
 #include <reset.h>
+#include <syscon.h>
 
 #include <dt-bindings/phy/phy-qcom-qusb2.h>
 
@@ -318,6 +320,7 @@ static const struct qusb2_phy_cfg qusb2_v2_phy_cfg = {
  *
  * @cfg_ahb_clk: AHB2PHY interface clock
  * @phy_rst: phy reset control
+ * @tcsr: TCSR syscon register map
  *
  * @cfg: phy config data
  * @has_se_clk_scheme: indicate if PHY has single-ended ref clock scheme
@@ -328,6 +331,7 @@ struct qusb2_phy {
 
 	struct clk cfg_ahb_clk;
 	struct reset_ctl phy_rst;
+	struct regmap *tcsr;
 
 	const struct qusb2_phy_cfg *cfg;
 	bool has_se_clk_scheme;
@@ -369,6 +373,7 @@ static int qusb2phy_power_on(struct phy *phy)
 {
 	struct qusb2_phy *qphy = dev_get_priv(phy->dev);
 	const struct qusb2_phy_cfg *cfg = qphy->cfg;
+	unsigned int clk_scheme;
 	int ret;
 	u32 val;
 
@@ -400,6 +405,31 @@ static int qusb2phy_power_on(struct phy *phy)
 	 * value hardcoded in the configuration.
 	 */
 	qphy->has_se_clk_scheme = cfg->se_clk_scheme_default;
+
+	/*
+	 * read TCSR_PHY_CLK_SCHEME register to check if single-ended
+	 * clock scheme is selected. If yes, then disable differential
+	 * ref_clk and use single-ended clock, otherwise use differential
+	 * ref_clk only.
+	 */
+	if (qphy->tcsr) {
+		ret = regmap_read(qphy->tcsr, qphy->cfg->clk_scheme_offset,
+				  &clk_scheme);
+		if (ret) {
+			printf("%s: failed to read clk scheme reg\n", __func__);
+			return ret;
+		}
+
+		/* is it a differential clock scheme ? */
+		if (!(clk_scheme & PHY_CLK_SCHEME_SEL)) {
+			debug("%s(): select differential clk\n",
+				 __func__);
+			qphy->has_se_clk_scheme = false;
+		} else {
+			debug("%s(): select single-ended clk\n",
+				 __func__);
+		}
+	}
 
 	if (cfg->has_pll_test) {
 		if (!qphy->has_se_clk_scheme)
@@ -486,6 +516,13 @@ static int qusb2phy_probe(struct udevice *dev)
 	if (!qphy->cfg) {
 		printf("%s: Couldn't get driver data\n", __func__);
 		return -EINVAL;
+	}
+
+	qphy->tcsr = syscon_regmap_lookup_by_phandle(dev,
+							"qcom,tcsr-syscon");
+	if (IS_ERR(qphy->tcsr)) {
+		debug("%s: failed to lookup TCSR regmap\n", __func__);
+		qphy->tcsr = NULL;
 	}
 
 	debug("%s success qusb phy cfg %p\n", __func__, qphy->cfg);

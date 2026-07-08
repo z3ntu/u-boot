@@ -35,6 +35,7 @@ config PHY_QCOM_QMP_UFS
 config PHY_QCOM_QUSB2
 	tristate "Qualcomm USB QUSB2 PHY driver"
 	depends on PHY && ARCH_SNAPDRAGON
+	depends on SYSCON
 	help
 	  Enable this to support the Super-Speed USB transceiver on various
 	  Qualcomm chipsets.
